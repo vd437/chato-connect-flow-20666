@@ -2,8 +2,9 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Input } from "@/components/ui/input";
-import { Search, MessageSquare } from "lucide-react";
+import { Search, MessageSquare, Circle } from "lucide-react";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { Button } from "@/components/ui/button";
 
 interface Chat {
   id: string;
@@ -13,6 +14,8 @@ interface Chat {
   timestamp: string;
   unread: number;
   online: boolean;
+  hasStory?: boolean;
+  storySeenStatus?: "unseen" | "seen" | "none";
 }
 
 const mockChats: Chat[] = [
@@ -24,6 +27,8 @@ const mockChats: Chat[] = [
     timestamp: "2m ago",
     unread: 2,
     online: true,
+    hasStory: true,
+    storySeenStatus: "unseen",
   },
   {
     id: "2",
@@ -33,6 +38,8 @@ const mockChats: Chat[] = [
     timestamp: "1h ago",
     unread: 0,
     online: true,
+    hasStory: true,
+    storySeenStatus: "seen",
   },
   {
     id: "3",
@@ -42,6 +49,8 @@ const mockChats: Chat[] = [
     timestamp: "3h ago",
     unread: 0,
     online: false,
+    hasStory: false,
+    storySeenStatus: "none",
   },
   {
     id: "4",
@@ -51,6 +60,8 @@ const mockChats: Chat[] = [
     timestamp: "1d ago",
     unread: 5,
     online: false,
+    hasStory: false,
+    storySeenStatus: "none",
   },
 ];
 
@@ -75,6 +86,9 @@ export default function ChatList() {
               <MessageSquare className="w-8 h-8 text-primary" />
               <h1 className="text-2xl font-bold">chato chato</h1>
             </div>
+            <Button variant="ghost" size="icon" onClick={() => navigate("/stories")}>
+              <Circle className="h-5 w-5" />
+            </Button>
           </div>
           <div className="relative">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
@@ -98,10 +112,25 @@ export default function ChatList() {
               className="flex items-center gap-4 p-4 rounded-lg hover:bg-accent/50 cursor-pointer transition-all animate-fade-in group"
             >
               <div className="relative">
-                <Avatar className="w-14 h-14 border-2 border-primary/20">
-                  <AvatarImage src={chat.avatar} alt={chat.name} />
-                  <AvatarFallback>{chat.name[0]}</AvatarFallback>
-                </Avatar>
+                {chat.hasStory && chat.storySeenStatus !== "none" ? (
+                  <div
+                    className={`p-0.5 rounded-full ${
+                      chat.storySeenStatus === "unseen"
+                        ? "bg-gradient-to-tr from-blue-500 via-blue-600 to-blue-700"
+                        : "bg-muted"
+                    }`}
+                  >
+                    <Avatar className="w-14 h-14 border-2 border-background">
+                      <AvatarImage src={chat.avatar} alt={chat.name} />
+                      <AvatarFallback>{chat.name[0]}</AvatarFallback>
+                    </Avatar>
+                  </div>
+                ) : (
+                  <Avatar className="w-14 h-14 border-2 border-primary/20">
+                    <AvatarImage src={chat.avatar} alt={chat.name} />
+                    <AvatarFallback>{chat.name[0]}</AvatarFallback>
+                  </Avatar>
+                )}
                 {chat.online && (
                   <div className="absolute bottom-0 right-0 w-4 h-4 bg-success rounded-full border-2 border-background" />
                 )}
