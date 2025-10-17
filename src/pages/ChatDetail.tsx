@@ -122,6 +122,14 @@ export default function ChatDetail() {
     setMessages([...messages, newMessage]);
   };
 
+  const handleDeleteMessage = (messageId: string, deleteBothSides: boolean) => {
+    setMessages(messages.filter(msg => msg.id !== messageId));
+    toast({
+      title: "Message deleted",
+      description: deleteBothSides ? "Message deleted for both parties" : "Message deleted for you",
+    });
+  };
+
   const handleProfileClick = () => {
     setProfileDialogOpen(true);
   };
@@ -223,7 +231,11 @@ export default function ChatDetail() {
       <ScrollArea className="flex-1 px-4 py-6">
         <div className="max-w-2xl mx-auto space-y-4">
           {messages.map((message) => (
-            <MessageBubble key={message.id} message={message} />
+            <MessageBubble 
+              key={message.id} 
+              message={message} 
+              onDelete={handleDeleteMessage}
+            />
           ))}
         </div>
       </ScrollArea>
