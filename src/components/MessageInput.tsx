@@ -3,10 +3,11 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Smile, Image, Video, Send } from "lucide-react";
 import EmojiPicker from "@/components/EmojiPicker";
+import VoiceRecorder from "@/components/VoiceRecorder";
 import { toast } from "@/hooks/use-toast";
 
 interface MessageInputProps {
-  onSend: (content: string, type: "text" | "image" | "video", mediaUrl?: string) => void;
+  onSend: (content: string, type: "text" | "image" | "video" | "audio", mediaUrl?: string) => void;
 }
 
 export default function MessageInput({ onSend }: MessageInputProps) {
@@ -47,6 +48,14 @@ export default function MessageInput({ onSend }: MessageInputProps) {
       });
       if (input) input.value = "";
     }
+  };
+
+  const handleVoiceRecordingSend = (audioUrl: string, duration: number) => {
+    onSend(`🎤 Voice message (${Math.floor(duration / 60)}:${(duration % 60).toString().padStart(2, '0')})`, "audio", audioUrl);
+    toast({
+      title: "Voice message sent!",
+      description: "Your audio has been sent successfully.",
+    });
   };
 
   return (
@@ -107,11 +116,13 @@ export default function MessageInput({ onSend }: MessageInputProps) {
           </Button>
 
           {showEmojiPicker && (
-            <div className="absolute bottom-full right-0 mb-2">
+            <div className="absolute bottom-full right-0 mb-2 w-72">
               <EmojiPicker onEmojiSelect={handleEmojiSelect} onClose={() => setShowEmojiPicker(false)} />
             </div>
           )}
         </div>
+
+        <VoiceRecorder onSend={handleVoiceRecordingSend} />
 
         <Button
           onClick={handleSend}

@@ -23,6 +23,7 @@ import {
 } from "@/components/ui/alert-dialog";
 import MessageBubble from "@/components/MessageBubble";
 import MessageInput from "@/components/MessageInput";
+import UserProfileDialog from "@/components/UserProfileDialog";
 import { toast } from "@/hooks/use-toast";
 
 interface Message {
@@ -30,7 +31,7 @@ interface Message {
   content: string;
   timestamp: string;
   isSent: boolean;
-  type: "text" | "image" | "video";
+  type: "text" | "image" | "video" | "audio";
   mediaUrl?: string;
 }
 
@@ -79,6 +80,7 @@ export default function ChatDetail() {
   const [isMuted, setIsMuted] = useState(false);
   const [clearDialogOpen, setClearDialogOpen] = useState(false);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [profileDialogOpen, setProfileDialogOpen] = useState(false);
 
   const chatInfo = mockChatInfo[chatId as keyof typeof mockChatInfo] || mockChatInfo["1"];
 
@@ -108,7 +110,7 @@ export default function ChatDetail() {
     navigate("/chats");
   };
 
-  const handleSendMessage = (content: string, type: "text" | "image" | "video", mediaUrl?: string) => {
+  const handleSendMessage = (content: string, type: "text" | "image" | "video" | "audio", mediaUrl?: string) => {
     const newMessage: Message = {
       id: Date.now().toString(),
       content,
@@ -118,6 +120,24 @@ export default function ChatDetail() {
       mediaUrl,
     };
     setMessages([...messages, newMessage]);
+  };
+
+  const handleProfileClick = () => {
+    setProfileDialogOpen(true);
+  };
+
+  const handleCall = () => {
+    toast({
+      title: "Voice Call",
+      description: "Starting voice call...",
+    });
+  };
+
+  const handleVideoCall = () => {
+    toast({
+      title: "Video Call",
+      description: "Starting video call...",
+    });
   };
 
   return (
@@ -133,7 +153,7 @@ export default function ChatDetail() {
           <ArrowLeft className="w-5 h-5" />
         </Button>
 
-        <div className="flex items-center gap-3 flex-1 cursor-pointer" onClick={() => {}}>
+        <div className="flex items-center gap-3 flex-1 cursor-pointer" onClick={handleProfileClick}>
           <div className="relative">
             <Avatar className="w-10 h-10 border-2 border-primary/20">
               <AvatarImage src={chatInfo.avatar} alt={chatInfo.name} />
@@ -152,10 +172,10 @@ export default function ChatDetail() {
         </div>
 
         <div className="flex items-center gap-2">
-          <Button variant="ghost" size="icon" className="rounded-full">
+          <Button variant="ghost" size="icon" className="rounded-full" onClick={handleCall}>
             <Phone className="w-5 h-5" />
           </Button>
-          <Button variant="ghost" size="icon" className="rounded-full">
+          <Button variant="ghost" size="icon" className="rounded-full" onClick={handleVideoCall}>
             <Video className="w-5 h-5" />
           </Button>
           <DropdownMenu>
@@ -262,6 +282,21 @@ export default function ChatDetail() {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      {/* User Profile Dialog */}
+      <UserProfileDialog
+        open={profileDialogOpen}
+        onOpenChange={setProfileDialogOpen}
+        user={{
+          ...chatInfo,
+          lastSeen: chatInfo.online ? undefined : "2 hours ago",
+        }}
+        messages={messages}
+        onMessage={() => setProfileDialogOpen(false)}
+        onMute={handleMuteToggle}
+        onCall={handleCall}
+        onVideoCall={handleVideoCall}
+      />
     </div>
   );
 }

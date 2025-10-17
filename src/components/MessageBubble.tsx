@@ -5,7 +5,7 @@ interface Message {
   content: string;
   timestamp: string;
   isSent: boolean;
-  type: "text" | "image" | "video";
+  type: "text" | "image" | "video" | "audio";
   mediaUrl?: string;
 }
 
@@ -52,7 +52,12 @@ export default function MessageBubble({ message }: MessageBubbleProps) {
             />
           </div>
         )}
-        <div className={cn("px-4 py-2", (type === "image" || type === "video") && mediaUrl && "pt-3")}>
+        {type === "audio" && mediaUrl && (
+          <div className="px-4 py-3">
+            <audio src={mediaUrl} controls className="w-full max-w-xs" />
+          </div>
+        )}
+        <div className={cn("px-4 py-2", (type === "image" || type === "video" || type === "audio") && mediaUrl && "pt-3")}>
           {content && <p className="text-sm break-words mb-1">{content}</p>}
           <span
             className={cn(
